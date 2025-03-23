@@ -64,6 +64,7 @@ e.g.
 + etc -->
 
 - GET `/pokemon/` - Get all Pokémon.
+- POST `/pokemon/` - Add a new Pokémon.
 - GET `/pokemon/{id}` - Get a Pokémon by ID.
 - GET `/pokemon?descriptionContains={string}` - Get all Pokémon with a description that contains the passed string.
 

@@ -114,6 +114,17 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //         REGION: "eu-west-1",
     //       },
     //     });
+    const addPokemonFn = new lambdanode.NodejsFunction(this, "AddPokemonFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_22_X,
+      entry: `${__dirname}/../lambdas/addPokemon.ts`,
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        TABLE_NAME: pokedexTable.tableName,
+        REGION: "eu-west-1",
+      },
+    });
 
     //     const deleteMovieFn = new lambdanode.NodejsFunction(this, "DeleteMovieFn", {
     //       architecture: lambda.Architecture.ARM_64,
@@ -181,6 +192,7 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //     moviesTable.grantReadData(getAllMoviesFn)
     pokedexTable.grantReadData(getAllPokemonFn);
     //     moviesTable.grantReadWriteData(newMovieFn)
+    pokedexTable.grantReadWriteData(addPokemonFn);
     //     moviesTable.grantReadWriteData(deleteMovieFn)
     //     movieCastsTable.grantReadData(getMovieCastMembersFn);
     //     movieCastsTable.grantReadData(getMovieByIdFn);
@@ -216,6 +228,10 @@ export class PokedexRestAPIStack extends cdk.Stack {
     pokemonEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getAllPokemonFn, { proxy: true })
+    );
+    pokemonEndpoint.addMethod(
+      "POST",
+      new apig.LambdaIntegration(addPokemonFn, { proxy: true })
     );
 
     const specificPokemonEndpoint = pokemonEndpoint.addResource("{pokemonId}");
