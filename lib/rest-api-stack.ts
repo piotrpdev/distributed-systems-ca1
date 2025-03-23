@@ -241,12 +241,25 @@ export class PokedexRestAPIStack extends cdk.Stack {
         stageName: "dev",
       },
       defaultCorsPreflightOptions: {
-        allowHeaders: ["Content-Type", "X-Amz-Date"],
+        allowHeaders: ["Content-Type", "X-Amz-Date", "X-API-Key"],
         allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
         allowCredentials: true,
         allowOrigins: ["*"],
       },
+      apiKeySourceType: apig.ApiKeySourceType.HEADER,
     });
+    
+    const apiKey = new apig.ApiKey(this, 'PokedexApiKey');
+    const usagePlan = new apig.UsagePlan(this, 'PokedexUsagePlan', {
+      name: 'Pokedex Usage Plan',
+      apiStages: [
+        {
+          api,
+          stage: api.deploymentStage,
+        },
+      ],
+    });
+    usagePlan.addApiKey(apiKey);
 
     // Pokemon endpoint
     const pokemonEndpoint = api.root.addResource("pokemon");
@@ -256,11 +269,13 @@ export class PokedexRestAPIStack extends cdk.Stack {
     );
     pokemonEndpoint.addMethod(
       "POST",
-      new apig.LambdaIntegration(addPokemonFn, { proxy: true })
+      new apig.LambdaIntegration(addPokemonFn, { proxy: true }),
+      { apiKeyRequired: true }
     );
     pokemonEndpoint.addMethod(
       "PUT",
-      new apig.LambdaIntegration(addPokemonFn, { proxy: true })
+      new apig.LambdaIntegration(addPokemonFn, { proxy: true }),
+      { apiKeyRequired: true }
     );
 
     const specificPokemonEndpoint = pokemonEndpoint.addResource("{pokemonId}");
@@ -274,6 +289,11 @@ export class PokedexRestAPIStack extends cdk.Stack {
       "GET",
       new apig.LambdaIntegration(getTranslatedPokemonByIdFn, { proxy: true })
     );
+
+    // You need to get the value from AWS for security reasons
+    new cdk.CfnOutput(this, 'Pokedex API Key ID', {
+      value: apiKey.keyId,
+    });
 
     //     // Movies endpoint
     //     const moviesEndpoint = api.root.addResource("movies");
