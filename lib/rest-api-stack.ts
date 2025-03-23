@@ -233,6 +233,10 @@ export class PokedexRestAPIStack extends cdk.Stack {
       "POST",
       new apig.LambdaIntegration(addPokemonFn, { proxy: true })
     );
+    pokemonEndpoint.addMethod(
+      "PUT",
+      new apig.LambdaIntegration(addPokemonFn, { proxy: true })
+    );
 
     const specificPokemonEndpoint = pokemonEndpoint.addResource("{pokemonId}");
     specificPokemonEndpoint.addMethod(

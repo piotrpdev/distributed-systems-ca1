@@ -63,8 +63,9 @@ e.g.
 + GEtT/thing/{partition-key}?attributeX=value - Get all the 'things' with a specified partition key value and its attributeX satisfying the condition .....
 + etc -->
 
-- GET `/pokemon/` - Get all Pokémon.
-- POST `/pokemon/` - Add a new Pokémon.
+- GET `/pokemon` - Get all Pokémon.
+- POST `/pokemon` - Add a new Pokémon.
+- PUT `/pokemon` - Update a Pokémon (using the pokemonId in the body).
 - GET `/pokemon/{id}` - Get a Pokémon by ID.
 - GET `/pokemon?descriptionContains={string}` - Get all Pokémon with a description that contains the passed string.
 

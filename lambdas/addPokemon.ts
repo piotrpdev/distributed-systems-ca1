@@ -1,4 +1,4 @@
-import { APIGatewayProxyHandlerV2 } from "aws-lambda";
+import { APIGatewayProxyHandler, APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import Ajv from "ajv";
@@ -9,7 +9,7 @@ const isValidBodyParams = ajv.compile(schema.definitions["Pokemon"] || {});
 
 const ddbDocClient = createDDbDocClient();
 
-export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
+export const handler: APIGatewayProxyHandler = async (event, context) => {
   try {
     console.log("[EVENT]", JSON.stringify(event));
     const body = event.body ? JSON.parse(event.body) : undefined;
@@ -39,7 +39,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const commandOutput = await ddbDocClient.send(
       new PutCommand({
         TableName: process.env.TABLE_NAME,
-        ConditionExpression: "attribute_not_exists(id)",
+        ConditionExpression: event.httpMethod === "POST" ? "attribute_not_exists(id)" : "attribute_exists(id)",
         Item: body,
       })
     );
@@ -48,7 +48,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ message: "Pokemon added" }),
+      body: JSON.stringify({ message: event.httpMethod === "POST" ? "Pokemon added" : "Pokemon updated" }),
     };
   } catch (error: any) {
     console.log(JSON.stringify(error));
