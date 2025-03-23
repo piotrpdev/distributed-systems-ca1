@@ -8,7 +8,7 @@ __Demo:__ ... link to your YouTube video demonstration ......
 
 ### Context
 
-- Pokémon Pokédex Data (trimmed to first 151 Pokémon).
+- Pokémon Pokédex Data (trimmed to first 20 Pokémon).
 - Taken from: <https://github.com/Purukitto/pokemon-data.json/blob/master/pokedex.json>
 - Copyrighted by the Pokémon Company and its affiliates.
 - Data collected from [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) and [pokemondb.net](https://pokemondb.net/)

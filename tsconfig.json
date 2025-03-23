@@ -22,13 +22,16 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "exclude": [
     "node_modules",
     "cdk.out"
   ],
   "include": [
-    "shared/*.json"
+    "shared/*.json",
+    "seed/*.json"
   ],
 }
