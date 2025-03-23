@@ -2,7 +2,7 @@
 
 __Name:__ Piotr Placzek (20097618)
 
-__Demo:__ ... link to your YouTube video demonstration ......
+__Demo:__ <https://youtu.be/blACcH1mZqQ>
 
 ## Details
 
@@ -64,12 +64,41 @@ image: {
 
 ### Features
 
-#### API Keys. (if completed)
+#### API Keys
 
-<!-- [Explain briefly how to implement API key authentication to protect API Gateway endpoints. Include code excerpts from your app to support this.]
+Modify code like this:
 
-~~~ts
-// This is a code excerpt markdown 
-let foo : string = 'Foo'
-console.log(foo)
-~~~ -->
+```ts
+// Specify API key source for the API Gateway
+const api = new apig.RestApi(this, "PokedexRestAPI", {
+  defaultCorsPreflightOptions: {
+    allowHeaders: [..., "X-API-Key"],
+    allowCredentials: true,
+    ...
+  },
+  apiKeySourceType: apig.ApiKeySourceType.HEADER,
+});
+
+// Create API key and usage plan (needed for API key to work)
+const apiKey = new apig.ApiKey(this, "PokedexApiKey");
+const usagePlan = new apig.UsagePlan(this, "PokedexUsagePlan", {
+  name: "Pokedex Usage Plan",
+  apiStages: [
+    {
+      api,
+      stage: api.deploymentStage, // Default stage e.g. dev/prod
+    },
+  ],
+});
+// Add the API key to the usage plan
+usagePlan.addApiKey(apiKey);
+
+// Specify API key is required for the endpoint(s)
+pokemonEndpoint.addMethod(
+  "POST",
+  new apig.LambdaIntegration(addPokemonFn, { proxy: true }),
+  { apiKeyRequired: true }
+);
+```
+
+Navigate to `Pokedex CDK Stack -> API Gateway -> API keys -> (API key) -> Show API Key`.
