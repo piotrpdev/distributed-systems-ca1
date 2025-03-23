@@ -81,3 +81,7 @@ export interface PokemonImage {
   thumbnail: string
   hires: string
 }
+
+export type AllPokemonQueryParams = {
+  descriptionContains?: string;
+}

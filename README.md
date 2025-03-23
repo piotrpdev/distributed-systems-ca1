@@ -65,6 +65,7 @@ e.g.
 
 - GET `/pokemon/` - Get all Pokémon.
 - GET `/pokemon/{id}` - Get a Pokémon by ID.
+- GET `/pokemon?descriptionContains={string}` - Get all Pokémon with a description that contains the passed string.
 
 ### Features
 
