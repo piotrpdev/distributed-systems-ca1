@@ -66,8 +66,9 @@ e.g.
 - GET `/pokemon` - Get all Pokémon.
 - POST `/pokemon` - Add a new Pokémon.
 - PUT `/pokemon` - Update a Pokémon (using the pokemonId in the body).
-- GET `/pokemon/{id}` - Get a Pokémon by ID.
 - GET `/pokemon?descriptionContains={string}` - Get all Pokémon with a description that contains the passed string.
+- GET `/pokemon/{id}` - Get a Pokémon by ID.
+- GET `/pokemon/{id}/translation?language={string}` - Get a Pokémon with their description translated to the passed language string.
 
 ### Features
 

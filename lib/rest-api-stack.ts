@@ -3,6 +3,7 @@ import * as cdk from "aws-cdk-lib";
 import * as lambdanode from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as custom from "aws-cdk-lib/custom-resources";
 import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
@@ -63,6 +64,22 @@ export class PokedexRestAPIStack extends cdk.Stack {
         architecture: lambda.Architecture.ARM_64,
         runtime: lambda.Runtime.NODEJS_18_X,
         entry: `${__dirname}/../lambdas/getPokemonById.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: pokedexTable.tableName,
+          REGION: 'eu-west-1',
+        },
+      }
+    );
+
+    const getTranslatedPokemonByIdFn = new lambdanode.NodejsFunction(
+      this,
+      "getTranslatedPokemonByIdFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        entry: `${__dirname}/../lambdas/getTranslatedPokemonById.ts`,
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
@@ -189,6 +206,14 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //     // Permissions 
     //     moviesTable.grantReadData(getMovieByIdFn)
     pokedexTable.grantReadData(getPokemonByIdFn);
+    pokedexTable.grantReadData(getTranslatedPokemonByIdFn);
+    // https://github.com/cdk-patterns/serverless/blob/08e31630e738f1b463c640cad1de6ca73d85f1c2/polly/typescript/lib/polly-stack.ts#L20-L27
+    getTranslatedPokemonByIdFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["translate:TranslateText"],
+        resources: ["*"],
+      })
+    );
     //     moviesTable.grantReadData(getAllMoviesFn)
     pokedexTable.grantReadData(getAllPokemonFn);
     //     moviesTable.grantReadWriteData(newMovieFn)
@@ -242,6 +267,12 @@ export class PokedexRestAPIStack extends cdk.Stack {
     specificPokemonEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getPokemonByIdFn, { proxy: true })
+    );
+
+    const translatedPokemonByIdEndpoint = specificPokemonEndpoint.addResource("translation");
+    translatedPokemonByIdEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getTranslatedPokemonByIdFn, { proxy: true })
     );
 
     //     // Movies endpoint

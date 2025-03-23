@@ -85,3 +85,7 @@ export interface PokemonImage {
 export type AllPokemonQueryParams = {
   descriptionContains?: string;
 }
+
+export type TranslatedPokemonByIdQueryParams = {
+  language: string;
+}
