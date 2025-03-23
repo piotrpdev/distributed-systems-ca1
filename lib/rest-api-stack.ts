@@ -72,6 +72,21 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //       },
     //     }
     //     );
+    const getAllPokemonFn = new lambdanode.NodejsFunction(
+      this,
+      "GetAllPokemonFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        entry: `${__dirname}/../lambdas/getAllPokemon.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: pokedexTable.tableName,
+          REGION: 'eu-west-1',
+        },
+      }
+    );
       
     //     const newMovieFn = new lambdanode.NodejsFunction(this, "AddMovieFn", {
     //       architecture: lambda.Architecture.ARM_64,
@@ -148,12 +163,13 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //     // Permissions 
     //     moviesTable.grantReadData(getMovieByIdFn)
     //     moviesTable.grantReadData(getAllMoviesFn)
+    pokedexTable.grantReadData(getAllPokemonFn);
     //     moviesTable.grantReadWriteData(newMovieFn)
     //     moviesTable.grantReadWriteData(deleteMovieFn)
     //     movieCastsTable.grantReadData(getMovieCastMembersFn);
     //     movieCastsTable.grantReadData(getMovieByIdFn);
         
-    //     // REST API 
+    // REST API 
     //     const api = new apig.RestApi(this, "RestAPI", {
     //       description: "demo api",
     //       deployOptions: {
@@ -166,6 +182,25 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //         allowOrigins: ["*"],
     //       },
     //     });
+    const api = new apig.RestApi(this, "PokedexRestAPI", {
+      description: "Pokedex API",
+      deployOptions: {
+        stageName: "dev",
+      },
+      defaultCorsPreflightOptions: {
+        allowHeaders: ["Content-Type", "X-Amz-Date"],
+        allowMethods: ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"],
+        allowCredentials: true,
+        allowOrigins: ["*"],
+      },
+    });
+
+    // Pokemon endpoint
+    const pokemonEndpoint = api.root.addResource("pokemon");
+    pokemonEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getAllPokemonFn, { proxy: true })
+    );
 
     //     // Movies endpoint
     //     const moviesEndpoint = api.root.addResource("movies");

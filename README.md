@@ -63,6 +63,8 @@ e.g.
 + GEtT/thing/{partition-key}?attributeX=value - Get all the 'things' with a specified partition key value and its attributeX satisfying the condition .....
 + etc -->
 
+- GET `/pokemon/` - Get all Pokémon.
+
 ### Features
 
 #### Translation persistence (if completed)
