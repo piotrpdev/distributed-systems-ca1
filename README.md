@@ -64,6 +64,7 @@ e.g.
 + etc -->
 
 - GET `/pokemon/` - Get all Pokémon.
+- GET `/pokemon/{id}` - Get a Pokémon by ID.
 
 ### Features
 

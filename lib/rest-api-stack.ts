@@ -56,6 +56,21 @@ export class PokedexRestAPIStack extends cdk.Stack {
     //     },
     //   }
     //   );
+    const getPokemonByIdFn = new lambdanode.NodejsFunction(
+      this,
+      "GetPokemonByIdFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_18_X,
+        entry: `${__dirname}/../lambdas/getPokemonById.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: pokedexTable.tableName,
+          REGION: 'eu-west-1',
+        },
+      }
+    );
       
     //   const getAllMoviesFn = new lambdanode.NodejsFunction(
     //     this,
@@ -162,6 +177,7 @@ export class PokedexRestAPIStack extends cdk.Stack {
         
     //     // Permissions 
     //     moviesTable.grantReadData(getMovieByIdFn)
+    pokedexTable.grantReadData(getPokemonByIdFn);
     //     moviesTable.grantReadData(getAllMoviesFn)
     pokedexTable.grantReadData(getAllPokemonFn);
     //     moviesTable.grantReadWriteData(newMovieFn)
@@ -200,6 +216,12 @@ export class PokedexRestAPIStack extends cdk.Stack {
     pokemonEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getAllPokemonFn, { proxy: true })
+    );
+
+    const specificPokemonEndpoint = pokemonEndpoint.addResource("{pokemonId}");
+    specificPokemonEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getPokemonByIdFn, { proxy: true })
     );
 
     //     // Movies endpoint
