@@ -12,3 +12,4 @@ cdk.out
 *.schema.json
 cdk.context.json
 package-lock.json
+.vscode/settings.json

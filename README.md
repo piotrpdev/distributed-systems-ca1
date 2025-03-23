@@ -8,18 +8,50 @@ __Demo:__ ... link to your YouTube video demonstration ......
 
 ### Context
 
-<!-- State the context you chose for your web API and detail the attributes of the DynamoDB table items, e.g.
-
-Context: Movie Cast
+- Pokémon Pokédex Data (trimmed to first 151 Pokémon).
+- Taken from: <https://github.com/Purukitto/pokemon-data.json/blob/master/pokedex.json>
+- Copyrighted by the Pokémon Company and its affiliates.
+- Data collected from [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page) and [pokemondb.net](https://pokemondb.net/)
 
 Table item attributes:
 
-+ MovieID - `number`  (Partition key)
-+ ActorID - `number`  (Sort Key)
-+ RoleName - `string`
-+ RoleDescription - `string`
-+ AwardsWon - `List<string>`
-+ etc -->
+```ts
+id: number // (Partition key)
+exists: boolean
+name: {
+  english: string
+  japanese: string
+  chinese: string
+  french: string
+}
+type: Array<string>
+base: {
+  HP: number
+  Attack: number
+  Defense: number
+  "Sp. Attack": number
+  "Sp. Defense": number
+  Speed: number
+}
+species: string
+description: string
+evolution: {
+  next?: Array<Array<string>>
+  prev?: Array<string>
+}
+profile: {
+  height: string
+  weight: string
+  egg: Array<string>
+  ability: Array<Array<string>>
+  gender: string
+}
+image: {
+  sprite: string
+  thumbnail: string
+  hires: string
+}
+```
 
 ### App API endpoints
 
